@@ -20,10 +20,25 @@ const franchiseCategorySchema = new mongoose.Schema(
       required: true,
       trim: true,
     },
+    tagline: {
+      type: String,
+      trim: true,
+      default: '',
+    },
     description: {
       type: String,
       required: true,
       trim: true,
+    },
+    roiEstimate: {
+      type: String,
+      trim: true,
+      default: '',
+    },
+    launchTimeline: {
+      type: String,
+      trim: true,
+      default: '',
     },
     investmentMin: {
       type: Number,

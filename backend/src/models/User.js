@@ -39,6 +39,15 @@ const userSchema = new mongoose.Schema(
       trim: true,
       default: '',
     },
+    favoriteCategories: {
+      type: [
+        {
+          type: mongoose.Schema.Types.ObjectId,
+          ref: 'FranchiseCategory',
+        },
+      ],
+      default: [],
+    },
   },
   {
     timestamps: true,

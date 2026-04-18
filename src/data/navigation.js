@@ -1,7 +1,9 @@
 export const navigationLinks = [
-  { to: '/', label: 'Home' },
+  { to: '/home', label: 'Home' },
+  { to: '/dashboard', label: 'Dashboard' },
+  { to: '/categories', label: 'Categories' },
   { to: '/about', label: 'About' },
-  { to: '/franchise', label: 'Categories' },
+  { to: '/franchise', label: 'Opportunities' },
   { to: '/plans', label: 'Plans' },
-  { to: '/contact', label: 'Contact' },
+  { to: '/contact', label: 'Support' },
 ]

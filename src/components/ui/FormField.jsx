@@ -1,3 +1,4 @@
+import { AlertCircle } from 'lucide-react'
 import { cn } from '../../utils/cn'
 
 function FormField({
@@ -11,12 +12,14 @@ function FormField({
   placeholder,
   error,
   rows,
+  hint,
+  required = false,
 }) {
   const Component = as
 
   return (
     <div>
-      <label className="mb-2 block text-sm font-medium text-slate-700" htmlFor={id}>
+      <label className="mb-2 block text-sm font-semibold theme-text-primary" htmlFor={id}>
         {label}
       </label>
       <Component
@@ -27,14 +30,19 @@ function FormField({
         value={value}
         onChange={onChange}
         placeholder={placeholder}
+        required={required}
         className={cn(
-          'glass-panel w-full rounded-2xl border px-4 py-3 text-sm text-slate-900 outline-none transition focus:ring-4',
-          error
-            ? 'border-rose-300 focus:border-rose-400 focus:ring-rose-100'
-            : 'border-blue-100 focus:border-blue-500 focus:ring-blue-100'
+          'form-field w-full rounded-[1.25rem] px-4 py-3 text-sm outline-none transition focus:border-[rgba(108,92,231,0.5)] focus:ring-4 focus:ring-[rgba(108,92,231,0.14)]',
+          error ? 'border-rose-300 focus:border-rose-400 focus:ring-rose-100' : ''
         )}
       />
-      {error && <p className="mt-2 text-sm text-rose-600">{error}</p>}
+      {hint && !error ? <p className="mt-2 text-xs theme-text-tertiary">{hint}</p> : null}
+      {error ? (
+        <p className="mt-2 inline-flex items-center gap-2 text-sm text-rose-500">
+          <AlertCircle className="h-4 w-4" />
+          {error}
+        </p>
+      ) : null}
     </div>
   )
 }

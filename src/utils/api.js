@@ -1,16 +1,21 @@
 const API_BASE_URL = (import.meta.env.VITE_API_BASE_URL || '').replace(/\/$/, '')
 const TOKEN_STORAGE_KEY = 'business_for_all_token'
 
-function buildUrl(path) {
+function normalizePath(path) {
   if (/^https?:\/\//.test(path)) {
     return path
   }
 
-  if (!path.startsWith('/')) {
-    return `${API_BASE_URL}/${path}`
+  if (!path) {
+    return '/'
   }
 
-  return `${API_BASE_URL}${path}`
+  return path.startsWith('/') ? path : `/${path}`
+}
+
+function buildUrl(path) {
+  const normalizedPath = normalizePath(path)
+  return /^https?:\/\//.test(normalizedPath) ? normalizedPath : `${API_BASE_URL}${normalizedPath}`
 }
 
 export function getStoredToken() {
@@ -39,17 +44,33 @@ export async function apiRequest(path, options = {}) {
     headers.set('Authorization', `Bearer ${token}`)
   }
 
-  const response = await fetch(buildUrl(path), {
+  const requestUrl = buildUrl(path)
+  const response = await fetch(requestUrl, {
     credentials: 'include',
     ...options,
     headers,
   })
 
-  const data = await response.json().catch(() => ({
-    success: false,
-    message: 'Invalid server response',
+  const responseText = await response.text()
+  let data = {
+    success: response.ok,
+    message: response.ok ? 'Request successful' : 'Request failed',
     data: {},
-  }))
+  }
+
+  if (responseText) {
+    try {
+      data = JSON.parse(responseText)
+    } catch {
+      data = {
+        success: false,
+        message: `Invalid server response from ${requestUrl}`,
+        data: {
+          raw: responseText.slice(0, 200),
+        },
+      }
+    }
+  }
 
   if (!response.ok || data.success === false) {
     const error = new Error(data.message || 'Request failed')
@@ -61,4 +82,4 @@ export async function apiRequest(path, options = {}) {
   return data
 }
 
-export { API_BASE_URL, TOKEN_STORAGE_KEY }
+export { API_BASE_URL, TOKEN_STORAGE_KEY, buildUrl }

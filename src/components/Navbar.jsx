@@ -1,16 +1,20 @@
 import { useEffect, useState } from 'react'
 import { motion } from 'framer-motion'
+import {
+  BadgeCheck,
+  Menu,
+  Sparkles,
+  X,
+} from 'lucide-react'
 import { NavLink, useNavigate } from 'react-router-dom'
 import useAuth from '../hooks/useAuth'
 import { navigationLinks } from '../data/navigation'
-import { socialLinks } from '../data/socialLinks'
 import ButtonLink from './ui/ButtonLink'
-import SocialIcon from './ui/SocialIcon'
 
 function Navbar() {
   const MotionNav = motion.nav
   const navigate = useNavigate()
-  const { isAuthenticated, logout } = useAuth()
+  const { isAuthenticated, logout, user } = useAuth()
   const [isOpen, setIsOpen] = useState(false)
   const [isScrolled, setIsScrolled] = useState(false)
 
@@ -20,82 +24,69 @@ function Navbar() {
     }
 
     handleScroll()
-    window.addEventListener('scroll', handleScroll)
+    window.addEventListener('scroll', handleScroll, { passive: true })
 
     return () => window.removeEventListener('scroll', handleScroll)
   }, [])
 
   const linkClassName = ({ isActive }) =>
-    `startup-button rounded-full px-4 py-2 transition ${
+    [
+      'startup-button rounded-full px-4 py-2 text-sm font-medium',
       isActive
-        ? 'border border-blue-100 bg-blue-50 text-blue-700 shadow-[0_10px_26px_rgba(37,99,235,0.12)]'
-        : 'text-slate-800 hover:bg-white hover:text-blue-700'
-    }`
+        ? 'bg-[rgba(108,92,231,0.14)] text-[var(--text-primary)] shadow-[0_10px_24px_rgba(79,124,255,0.12)]'
+        : 'theme-text-secondary hover:bg-white/10 hover:text-[var(--text-primary)]',
+    ].join(' ')
 
   return (
-    <header className="sticky top-3 z-50 sm:top-4">
+    <header id="top" className="sticky top-3 z-50 sm:top-4">
       <MotionNav
         initial={false}
         animate={{
-          backgroundColor: isScrolled ? 'rgba(255,255,255,0.92)' : 'rgba(255,255,255,0.78)',
-          borderColor: isScrolled ? 'rgba(226,232,240,0.95)' : 'rgba(219,234,254,0.8)',
+          y: isScrolled ? 0 : 2,
           boxShadow: isScrolled
-            ? '0 18px 44px rgba(15, 23, 42, 0.1)'
-            : '0 12px 28px rgba(148, 163, 184, 0.1)',
+            ? '0 20px 60px rgba(15,23,42,0.18)'
+            : '0 12px 36px rgba(15,23,42,0.08)',
         }}
-        className="glass-panel rounded-[1.75rem] border px-4 py-4 backdrop-blur-xl sm:px-6"
+        className={`nav-shell rounded-[1.8rem] px-4 py-4 sm:px-6 ${isScrolled ? 'premium-surface' : 'glass-panel'}`}
       >
         <div className="flex items-center justify-between gap-4">
-          <NavLink
-            to="/"
-            className="startup-button rounded-full px-3 py-2 text-xl font-extrabold tracking-tight text-slate-900"
-          >
-            <span className="gradient-text">Business</span> for All
+          <NavLink to="/" className="startup-button flex items-center gap-3 rounded-full px-2 py-1">
+            <span className="inline-flex h-11 w-11 items-center justify-center rounded-2xl bg-[linear-gradient(135deg,#6c5ce7,#18c7d8)] text-white shadow-[0_14px_30px_rgba(108,92,231,0.28)]">
+              <Sparkles className="h-5 w-5" />
+            </span>
+            <span>
+              <span className="block text-xs uppercase tracking-[0.22em] text-cyan-500">Business for All</span>
+              <span className="block text-base font-bold theme-text-primary">Franchise Growth Platform</span>
+            </span>
           </NavLink>
 
-          <button
-            type="button"
-            className="startup-button inline-flex h-11 w-11 items-center justify-center rounded-full border border-blue-100 bg-white/80 text-slate-700 shadow-sm hover:bg-white md:hidden"
-            onClick={() => setIsOpen((open) => !open)}
-            aria-expanded={isOpen}
-            aria-controls="mobile-navigation"
-            aria-label="Toggle navigation menu"
-          >
-            <span className="sr-only">Toggle navigation</span>
-            <div className="flex flex-col gap-1.5">
-              <span
-                className={`block h-0.5 w-5 bg-current transition-transform ${
-                  isOpen ? 'translate-y-2 rotate-45' : ''
-                }`}
-              />
-              <span
-                className={`block h-0.5 w-5 bg-current transition-opacity ${
-                  isOpen ? 'opacity-0' : 'opacity-100'
-                }`}
-              />
-              <span
-                className={`block h-0.5 w-5 bg-current transition-transform ${
-                  isOpen ? '-translate-y-2 -rotate-45' : ''
-                }`}
-              />
-            </div>
-          </button>
+          <div className="hidden items-center gap-2 xl:flex">
+            {isAuthenticated
+              ? navigationLinks.map((link) => (
+                <NavLink
+                  key={link.to}
+                  to={link.to}
+                  end={link.to === '/home'}
+                  className={linkClassName}
+                  onClick={() => setIsOpen(false)}
+                >
+                  {link.label}
+                </NavLink>
+              ))
+              : null}
+          </div>
 
-          <div className="hidden items-center gap-2 text-sm font-medium xl:flex">
-            {navigationLinks.map((link) => (
-              <NavLink
-                key={link.to}
-                to={link.to}
-                end={link.to === '/'}
-                className={linkClassName}
-                onClick={() => setIsOpen(false)}
-              >
-                {link.label}
-              </NavLink>
-            ))}
+          <div className="hidden items-center gap-3 md:flex">
             {isAuthenticated ? (
               <>
-                <ButtonLink to="/dashboard" className="ml-2" variant="secondary">
+                <div className="kpi-chip hidden items-center gap-2 rounded-full px-3 py-2 text-xs font-semibold uppercase tracking-[0.16em] theme-text-secondary lg:inline-flex">
+                  <BadgeCheck className="h-3.5 w-3.5 text-emerald-400" />
+                  Live platform
+                </div>
+                <div className="hidden rounded-full border theme-border bg-white/8 px-4 py-2 text-sm font-medium theme-text-secondary lg:block">
+                  {user?.fullName?.split(' ')[0] || 'Member'}
+                </div>
+                <ButtonLink to="/dashboard" variant="secondary">
                   Dashboard
                 </ButtonLink>
                 <button
@@ -104,96 +95,83 @@ function Navbar() {
                     await logout()
                     navigate('/')
                   }}
-                  className="startup-button rounded-full border border-blue-100 bg-white px-4 py-3 text-sm font-semibold text-slate-700 shadow-sm"
+                  className="startup-button secondary-button rounded-full px-5 py-3 text-sm font-semibold"
                 >
                   Logout
                 </button>
               </>
             ) : (
               <>
-                <ButtonLink to="/login" className="ml-2" variant="secondary">
+                <ButtonLink to="/login" variant="secondary">
                   Login
                 </ButtonLink>
-                <ButtonLink to="/register">
-                  Register
+                <ButtonLink to="/register" withArrow>
+                  Become a Partner
                 </ButtonLink>
               </>
             )}
           </div>
 
-          <div className="hidden items-center gap-2 md:flex xl:hidden">
-            {socialLinks.slice(0, 3).map((item) => (
-              <a
-                key={item.label}
-                href={item.href}
-                target="_blank"
-                rel="noreferrer"
-                aria-label={item.label}
-                className="startup-button group inline-flex h-11 w-11 items-center justify-center rounded-full border border-slate-200/80 bg-white text-slate-700 shadow-[0_10px_24px_rgba(15,23,42,0.06)] hover:-translate-y-1 hover:text-blue-700 hover:shadow-[0_14px_28px_rgba(37,99,235,0.14)]"
-              >
-                <SocialIcon item={item} />
-              </a>
-            ))}
+          <div className="flex items-center gap-2 md:hidden">
+            <button
+              type="button"
+              onClick={() => setIsOpen((current) => !current)}
+              className="startup-button secondary-button inline-flex h-11 w-11 items-center justify-center rounded-full"
+              aria-expanded={isOpen}
+              aria-controls="mobile-navigation"
+              aria-label="Toggle navigation menu"
+            >
+              {isOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
+            </button>
           </div>
         </div>
 
-        <div
-          id="mobile-navigation"
-          className={`${isOpen ? 'mt-4 flex' : 'hidden'} flex-col gap-2 border-t border-blue-100 pt-4 md:hidden`}
-        >
-          {navigationLinks.map((link) => (
-            <NavLink
-              key={link.to}
-              to={link.to}
-              end={link.to === '/'}
-              className={linkClassName}
-              onClick={() => setIsOpen(false)}
-            >
-              {link.label}
-            </NavLink>
-          ))}
-          {isAuthenticated ? (
-            <>
-              <ButtonLink to="/dashboard" className="mt-2 w-full" variant="secondary" onClick={() => setIsOpen(false)}>
-                Dashboard
-              </ButtonLink>
-              <button
-                type="button"
-                onClick={async () => {
-                  setIsOpen(false)
-                  await logout()
-                  navigate('/')
-                }}
-                className="startup-button mt-2 inline-flex w-full items-center justify-center rounded-full border border-blue-100 bg-white px-6 py-3 text-sm font-semibold text-slate-700 shadow-sm"
-              >
-                Logout
-              </button>
-            </>
-          ) : (
-            <>
-              <ButtonLink to="/login" className="mt-2 w-full" variant="secondary" onClick={() => setIsOpen(false)}>
-                Login
-              </ButtonLink>
-              <ButtonLink to="/register" className="mt-2 w-full" onClick={() => setIsOpen(false)}>
-                Register
-              </ButtonLink>
-            </>
-          )}
-          <div className="mt-3 flex flex-wrap gap-2">
-            {socialLinks.map((item) => (
-              <a
-                key={item.label}
-                href={item.href}
-                target="_blank"
-                rel="noreferrer"
-                aria-label={item.label}
-                className="startup-button group inline-flex h-11 w-11 items-center justify-center rounded-full border border-slate-200/80 bg-white text-slate-700 shadow-[0_10px_24px_rgba(15,23,42,0.06)] hover:-translate-y-1 hover:text-blue-700 hover:shadow-[0_14px_28px_rgba(37,99,235,0.14)]"
-              >
-                <SocialIcon item={item} />
-              </a>
-            ))}
+        {isOpen ? (
+          <div id="mobile-navigation" className="mt-4 space-y-2 border-t theme-border pt-4 md:hidden">
+            {isAuthenticated
+              ? navigationLinks.map((link) => (
+                <NavLink
+                  key={link.to}
+                  to={link.to}
+                  end={link.to === '/home'}
+                  className={linkClassName}
+                  onClick={() => setIsOpen(false)}
+                >
+                  {link.label}
+                </NavLink>
+              ))
+              : null}
+            <div className="grid gap-3 pt-2">
+              {isAuthenticated ? (
+                <>
+                  <ButtonLink to="/dashboard" variant="secondary" className="w-full" onClick={() => setIsOpen(false)}>
+                    Dashboard
+                  </ButtonLink>
+                  <button
+                    type="button"
+                    onClick={async () => {
+                      setIsOpen(false)
+                      await logout()
+                      navigate('/')
+                    }}
+                    className="startup-button secondary-button w-full rounded-full px-5 py-3 text-sm font-semibold"
+                  >
+                    Logout
+                  </button>
+                </>
+              ) : (
+                <>
+                  <ButtonLink to="/login" variant="secondary" className="w-full" onClick={() => setIsOpen(false)}>
+                    Login
+                  </ButtonLink>
+                  <ButtonLink to="/register" className="w-full" onClick={() => setIsOpen(false)}>
+                    Become a Partner
+                  </ButtonLink>
+                </>
+              )}
+            </div>
           </div>
-        </div>
+        ) : null}
       </MotionNav>
     </header>
   )

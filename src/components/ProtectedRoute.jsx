@@ -1,12 +1,13 @@
 import { Navigate, useLocation } from 'react-router-dom'
 import useAuth from '../hooks/useAuth'
+import LoadingScreen from './LoadingScreen'
 
 function ProtectedRoute({ children }) {
   const location = useLocation()
   const { isAuthenticated, isReady } = useAuth()
 
   if (!isReady) {
-    return null
+    return <LoadingScreen />
   }
 
   if (!isAuthenticated) {

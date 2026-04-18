@@ -1,4 +1,4 @@
-const { body } = require('express-validator');
+const { body, param } = require('express-validator');
 
 const updateProfileValidator = [
   body('fullName').optional().trim().notEmpty().withMessage('Full name cannot be empty'),
@@ -7,6 +7,16 @@ const updateProfileValidator = [
   body('state').optional().isString().withMessage('State must be text'),
 ];
 
+const favoriteValidator = [
+  body('categoryId').isMongoId().withMessage('A valid opportunity id is required'),
+];
+
+const favoriteParamValidator = [
+  param('categoryId').isMongoId().withMessage('A valid opportunity id is required'),
+];
+
 module.exports = {
   updateProfileValidator,
+  favoriteValidator,
+  favoriteParamValidator,
 };

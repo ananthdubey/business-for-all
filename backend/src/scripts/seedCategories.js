@@ -12,7 +12,7 @@ const seedCategories = async () => {
       await FranchiseCategory.findOneAndUpdate(
         { slug: category.slug },
         category,
-        { upsert: true, new: true, setDefaultsOnInsert: true }
+        { upsert: true, returnDocument: 'after', setDefaultsOnInsert: true }
       );
     }
 

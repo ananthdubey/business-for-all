@@ -4,7 +4,10 @@ const createCategoryValidator = [
   body('title').trim().notEmpty().withMessage('Title is required'),
   body('slug').optional().trim().isString().withMessage('Slug must be a string'),
   body('type').trim().notEmpty().withMessage('Type is required'),
+  body('tagline').optional().isString().withMessage('Tagline must be text'),
   body('description').trim().notEmpty().withMessage('Description is required'),
+  body('roiEstimate').optional().isString().withMessage('ROI estimate must be text'),
+  body('launchTimeline').optional().isString().withMessage('Launch timeline must be text'),
   body('investmentMin')
     .isFloat({ min: 0 })
     .withMessage('Minimum investment must be a valid number'),
@@ -27,7 +30,10 @@ const updateCategoryValidator = [
   body('title').optional().trim().notEmpty().withMessage('Title cannot be empty'),
   body('slug').optional().trim().isString().withMessage('Slug must be a string'),
   body('type').optional().trim().notEmpty().withMessage('Type cannot be empty'),
+  body('tagline').optional().isString().withMessage('Tagline must be text'),
   body('description').optional().trim().notEmpty().withMessage('Description cannot be empty'),
+  body('roiEstimate').optional().isString().withMessage('ROI estimate must be text'),
+  body('launchTimeline').optional().isString().withMessage('Launch timeline must be text'),
   body('investmentMin')
     .optional()
     .isFloat({ min: 0 })

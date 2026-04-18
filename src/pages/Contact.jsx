@@ -1,7 +1,10 @@
 import { useState } from 'react'
+import { CheckCircle2, Headphones, PhoneCall } from 'lucide-react'
 import { AnimatedReveal } from '../components/ui/AnimatedReveal'
 import FormField from '../components/ui/FormField'
 import PageHero from '../components/ui/PageHero'
+import usePageMeta from '../hooks/usePageMeta'
+import useToast from '../hooks/useToast'
 import { contactDetails } from '../data/siteContent'
 import { apiRequest } from '../utils/api'
 import {
@@ -10,6 +13,12 @@ import {
 } from '../utils/contactValidation'
 
 function Contact() {
+  usePageMeta({
+    title: 'Contact',
+    description: 'Talk to a Business for All advisor about franchise fit, launch support, and next steps.',
+  })
+
+  const { showToast } = useToast()
   const [formData, setFormData] = useState(initialContactForm)
   const [errors, setErrors] = useState({})
   const [isSubmitted, setIsSubmitted] = useState(false)
@@ -52,9 +61,19 @@ function Contact() {
         setIsSubmitted(true)
         setSubmitMessage(response.message || 'Your message has been submitted successfully.')
         setFormData(initialContactForm)
+        showToast({
+          tone: 'success',
+          title: 'Message submitted',
+          description: 'A team member will get back to you soon.',
+        })
       })
       .catch((requestError) => {
         setSubmitMessage(requestError.message)
+        showToast({
+          tone: 'error',
+          title: 'Unable to submit message',
+          description: requestError.message,
+        })
       })
       .finally(() => {
         setIsSubmitting(false)
@@ -62,31 +81,32 @@ function Contact() {
   }
 
   return (
-    <div className="mx-auto max-w-6xl space-y-8">
+    <div className="mx-auto max-w-7xl space-y-8">
       <PageHero
-        badge="Contact Us"
-        title="Let's talk about your next business move."
-        description="Reach out for plan details, franchise guidance, or help choosing the right path to get started."
+        badge="Contact"
+        title="Talk to a real advisor about your next business move."
+        description="The contact flow is now designed to feel high-trust and product-grade while preserving the same backend submission logic."
       />
 
-      <section className="grid gap-6 lg:grid-cols-[1.1fr_0.9fr]">
-        <AnimatedReveal className="glass-panel rounded-[2rem] border border-white/70 p-6 shadow-[0_18px_48px_rgba(15,23,42,0.08)] sm:p-8">
-          <div className="max-w-2xl">
-            <p className="text-sm font-semibold uppercase tracking-[0.18em] text-blue-700">
-              Enquiry Form
-            </p>
-            <h2 className="mt-3 text-3xl font-extrabold tracking-tight text-slate-900">
-              Send us a message
-            </h2>
-          </div>
+      <section className="grid gap-6 lg:grid-cols-[1.08fr_0.92fr]">
+        <AnimatedReveal className="surface-panel rounded-[2rem] p-6 sm:p-8">
+          <p className="text-sm font-semibold uppercase tracking-[0.18em] text-cyan-500">
+            Enquiry Form
+          </p>
+          <h2 className="mt-3 text-3xl font-bold theme-text-primary">
+            Tell us what kind of opportunity you want to build.
+          </h2>
 
           {submitMessage ? (
-            <div className={`mt-6 rounded-2xl px-4 py-3 text-sm ${
+            <div className={`mt-6 rounded-[1.5rem] px-4 py-4 text-sm ${
               isSubmitted
-                ? 'border border-emerald-200 bg-emerald-50 text-emerald-700'
-                : 'border border-rose-200 bg-rose-50 text-rose-700'
+                ? 'border border-emerald-300/30 bg-emerald-400/10 text-emerald-300'
+                : 'border border-rose-300/30 bg-rose-400/10 text-rose-300'
             }`}>
-              {submitMessage}
+              <div className="flex items-start gap-3">
+                {isSubmitted ? <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0" /> : null}
+                <span>{submitMessage}</span>
+              </div>
             </div>
           ) : null}
 
@@ -136,47 +156,48 @@ function Contact() {
               error={errors.message}
             />
 
-            <button
-              type="submit"
-              disabled={isSubmitting}
-              className="startup-button inline-flex items-center justify-center rounded-full border border-blue-800/80 bg-gradient-to-r from-blue-900 via-blue-700 to-cyan-500 px-6 py-3 text-sm font-semibold text-white shadow-[0_18px_40px_rgba(30,58,138,0.24)]"
-            >
+            <button type="submit" disabled={isSubmitting} className="startup-button brand-button rounded-full px-6 py-3 text-sm font-semibold disabled:cursor-not-allowed disabled:opacity-70">
               {isSubmitting ? 'Submitting...' : 'Submit Enquiry'}
             </button>
           </form>
         </AnimatedReveal>
 
         <div className="space-y-6">
-          <AnimatedReveal className="glass-panel rounded-[2rem] border border-white/70 p-6 shadow-[0_18px_48px_rgba(15,23,42,0.08)] sm:p-8">
-            <p className="text-sm font-semibold uppercase tracking-[0.18em] text-blue-700">
-              Contact Info
-            </p>
-            <div className="mt-6 space-y-5 text-sm leading-7 text-slate-600 sm:text-base">
+          <AnimatedReveal className="surface-panel rounded-[2rem] p-6 sm:p-8">
+            <div className="flex items-center gap-3">
+              <Headphones className="h-5 w-5 text-cyan-500" />
+              <p className="text-sm font-semibold uppercase tracking-[0.18em] text-cyan-500">
+                Contact Info
+              </p>
+            </div>
+            <div className="mt-6 space-y-5 text-sm leading-7 theme-text-secondary sm:text-base">
               {contactDetails.map((item) => (
                 <div key={item.title}>
-                  <h3 className="text-lg font-semibold text-slate-900">{item.title}</h3>
+                  <h3 className="text-lg font-semibold theme-text-primary">{item.title}</h3>
                   <p>{item.value}</p>
                 </div>
               ))}
             </div>
           </AnimatedReveal>
 
-          <AnimatedReveal className="animated-border rounded-[2rem] border border-blue-100 bg-[linear-gradient(180deg,#eef4ff_0%,#ffffff_100%)] p-6 text-slate-900 shadow-[0_22px_54px_rgba(37,99,235,0.1)] sm:p-8">
-            <p className="text-sm font-semibold uppercase tracking-[0.18em] text-cyan-700">
-              Quick Connect
-            </p>
-            <h2 className="mt-3 text-3xl font-extrabold tracking-tight">
+          <AnimatedReveal className="hero-shell animated-border rounded-[2rem] p-6 sm:p-8">
+            <div className="flex items-center gap-3">
+              <PhoneCall className="h-5 w-5 text-cyan-500" />
+              <p className="text-sm font-semibold uppercase tracking-[0.18em] text-cyan-500">
+                Instant Connect
+              </p>
+            </div>
+            <h2 className="mt-3 text-3xl font-bold theme-text-primary">
               Prefer WhatsApp?
             </h2>
-            <p className="mt-4 text-sm leading-7 text-slate-700 sm:text-base">
-              Start a conversation directly for faster responses about plans,
-              pricing, and franchise opportunities.
+            <p className="mt-4 text-sm leading-7 theme-text-secondary sm:text-base">
+              Start a direct conversation for faster responses around pricing, support, and opportunity fit.
             </p>
             <a
               href="https://wa.me/919876543210"
               target="_blank"
               rel="noreferrer"
-              className="startup-button mt-6 inline-flex items-center justify-center rounded-full border border-white/60 bg-white px-6 py-3 text-sm font-semibold text-blue-800 transition hover:bg-blue-50"
+              className="startup-button secondary-button mt-6 inline-flex items-center justify-center rounded-full px-6 py-3 text-sm font-semibold"
             >
               Chat on WhatsApp
             </a>

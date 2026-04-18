@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
 import AuthContext from './auth-context'
-import { apiRequest, setStoredToken } from '../utils/api'
+import { apiRequest, getStoredToken, setStoredToken } from '../utils/api'
 
 function AuthProvider({ children }) {
   const [user, setUser] = useState(null)
@@ -17,6 +17,9 @@ function AuthProvider({ children }) {
     const hydrateSession = async () => {
       try {
         const response = await apiRequest('/api/auth/me')
+        if (response.data?.token || getStoredToken()) {
+          setStoredToken(response.data?.token || getStoredToken())
+        }
         setUser(response.data)
       } catch {
         setStoredToken('')
@@ -36,8 +39,8 @@ function AuthProvider({ children }) {
       body: JSON.stringify(payload),
     })
 
-    setStoredToken(response.data.token)
-    setUser(response.data.user)
+    setStoredToken(response.data?.token)
+    setUser(response.data?.user || null)
     return response.data
   }
 
@@ -47,8 +50,8 @@ function AuthProvider({ children }) {
       body: JSON.stringify(payload),
     })
 
-    setStoredToken(response.data.token)
-    setUser(response.data.user)
+    setStoredToken(response.data?.token)
+    setUser(response.data?.user || null)
     return response.data
   }
 

@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { AnimatePresence, motion } from 'framer-motion'
 import { apiRequest } from '../utils/api'
 
@@ -41,7 +41,6 @@ function ChatWidget() {
     ),
   ])
   const viewportRef = useRef(null)
-  const apiBaseUrl = useMemo(() => import.meta.env.VITE_API_BASE_URL || '', [])
 
   useEffect(() => {
     if (viewportRef.current) {
@@ -54,7 +53,7 @@ function ChatWidget() {
     setIsLoading(true)
 
     try {
-      const response = await apiRequest(`${apiBaseUrl}/api/support/chat`, {
+      const response = await apiRequest('/api/support/chat', {
         method: 'POST',
         body: JSON.stringify({ message: question }),
       })

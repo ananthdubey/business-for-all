@@ -1,4 +1,5 @@
 const FranchiseCategory = require('../models/FranchiseCategory');
+const dbState = require('../config/dbState');
 const asyncHandler = require('../utils/asyncHandler');
 const { sendResponse } = require('../utils/apiResponse');
 
@@ -35,11 +36,13 @@ const getReplyFromMessage = async (message) => {
   }
 
   if (normalized.includes('investment') || normalized.includes('plan') || normalized.includes('price')) {
-    const categories = await FranchiseCategory.find({ active: true })
-      .sort({ createdAt: -1 })
-      .limit(3)
-      .select('title investmentMin investmentMax')
-      .lean();
+    const categories = dbState.getState().isReady
+      ? await FranchiseCategory.find({ active: true })
+          .sort({ createdAt: -1 })
+          .limit(3)
+          .select('title investmentMin investmentMax')
+          .lean()
+      : [];
 
     const planSummary = categories
       .map((category) => {
@@ -66,11 +69,13 @@ const getReplyFromMessage = async (message) => {
   }
 
   if (normalized.includes('franchise') || normalized.includes('type') || normalized.includes('category')) {
-    const categories = await FranchiseCategory.find({ active: true })
-      .sort({ createdAt: -1 })
-      .limit(4)
-      .select('title type description')
-      .lean();
+    const categories = dbState.getState().isReady
+      ? await FranchiseCategory.find({ active: true })
+          .sort({ createdAt: -1 })
+          .limit(4)
+          .select('title type description')
+          .lean()
+      : [];
 
     const categorySummary = categories
       .map((category) => category.title || category.type)

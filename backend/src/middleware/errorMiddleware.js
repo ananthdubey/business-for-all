@@ -15,6 +15,11 @@ const errorHandler = (error, _req, res, _next) => {
     statusCode = 400;
   }
 
+  if (error.name === 'JsonWebTokenError' || error.name === 'TokenExpiredError') {
+    statusCode = 401;
+    message = 'Your session is invalid or has expired. Please sign in again.';
+  }
+
   if (error.code === 11000) {
     statusCode = 409;
     message = 'A record with this value already exists';
@@ -22,6 +27,10 @@ const errorHandler = (error, _req, res, _next) => {
 
   if (error.name === 'MulterError') {
     statusCode = 400;
+  }
+
+  if (typeof message === 'string' && message.startsWith('CORS origin not allowed:')) {
+    statusCode = 403;
   }
 
   res.status(statusCode).json({

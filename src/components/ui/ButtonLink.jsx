@@ -1,27 +1,33 @@
+import { ArrowRight } from 'lucide-react'
 import { Link } from 'react-router-dom'
 import { cn } from '../../utils/cn'
 
-function ButtonLink({ to, children, variant = 'primary', className = '', ...props }) {
+function ButtonLink({
+  to,
+  children,
+  variant = 'primary',
+  className = '',
+  withArrow = false,
+  ...props
+}) {
   const variants = {
-    primary:
-      'border border-blue-800/80 bg-gradient-to-r from-blue-900 via-blue-700 to-cyan-500 text-white shadow-[0_18px_40px_rgba(30,58,138,0.24)] hover:shadow-[0_24px_48px_rgba(30,58,138,0.28)]',
-    secondary:
-      'glass-panel border border-blue-100 text-slate-800 shadow-[0_12px_28px_rgba(15,23,42,0.07)] hover:border-blue-200 hover:bg-white',
-    light:
-      'border border-white/70 bg-white text-blue-800 shadow-[0_14px_34px_rgba(148,163,184,0.14)] hover:bg-blue-50',
+    primary: 'brand-button border border-white/10',
+    secondary: 'secondary-button',
+    light: 'border border-white/40 bg-white/90 text-slate-900 shadow-[0_16px_36px_rgba(148,163,184,0.16)]',
   }
 
   return (
     <Link
       to={to}
       className={cn(
-        'startup-button inline-flex min-h-11 items-center justify-center rounded-full px-6 py-3 text-sm font-semibold tracking-[0.01em]',
+        'startup-button inline-flex min-h-11 items-center justify-center gap-2 rounded-full px-6 py-3 text-sm font-semibold tracking-[0.01em]',
         variants[variant],
         className
       )}
       {...props}
     >
-      {children}
+      <span>{children}</span>
+      {withArrow ? <ArrowRight className="h-4 w-4" /> : null}
     </Link>
   )
 }
