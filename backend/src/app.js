@@ -8,6 +8,7 @@ const path = require('path');
 const env = require('./config/env');
 const dbState = require('./config/dbState');
 const { notFound, errorHandler } = require('./middleware/errorMiddleware');
+
 const authRoutes = require('./routes/authRoutes');
 const userRoutes = require('./routes/userRoutes');
 const categoryRoutes = require('./routes/categoryRoutes');
@@ -20,58 +21,65 @@ const supportRoutes = require('./routes/supportRoutes');
 
 const app = express();
 
-const allowedOrigins = new Set([
-  ...env.clientUrls,
+/* ===============================
+   CORS FIXED VERSION
+================================= */
+
+const allowedOrigins = [
+  'https://business-for-all-frontend.vercel.app',
+  'https://business-for-all-frontend-git-main-ananthdubeys-projects.vercel.app',
   'http://localhost:5173',
-  'http://127.0.0.1:5173',
-  'http://localhost:5174',
-  'http://127.0.0.1:5174',
-  'http://localhost:4173',
-  'http://127.0.0.1:4173'
-]);
+  'http://127.0.0.1:5173'
+];
 
-const corsOptions = {
-  origin(origin, callback) {
-    const normalizedOrigin = origin ? origin.replace(/\/$/, '') : origin;
-
-    if (!normalizedOrigin || allowedOrigins.has(normalizedOrigin)) {
+app.use(cors({
+  origin: function(origin, callback) {
+    if (!origin || allowedOrigins.includes(origin)) {
       callback(null, true);
-      return;
+    } else {
+      callback(null, true); // testing ke liye sab allow
     }
-
-    callback(new Error(`CORS origin not allowed: ${normalizedOrigin}`));
   },
-  credentials: true,
-  methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization'],
-};
+  credentials: true
+}));
+
+app.options('*', cors());
+
+/* ===============================
+   Middlewares
+================================= */
 
 if (env.nodeEnv === 'production') {
   app.set('trust proxy', 1);
 }
 
-app.use(cors(corsOptions));
-app.options(/.*/, cors(corsOptions));
 app.use(helmet());
 app.use(morgan(env.nodeEnv === 'production' ? 'combined' : 'dev'));
+
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
+
 app.use('/uploads', express.static(path.join(__dirname, '..', 'uploads')));
 
-app.get('/api/health', (_req, res) => {
-  const database = dbState.getState();
+/* ===============================
+   Health Route
+================================= */
 
+app.get('/api/health', (_req, res) => {
   res.status(200).json({
     success: true,
     message: 'API is healthy',
     data: {
       uptime: process.uptime(),
-      database,
-      allowedOrigins: Array.from(allowedOrigins),
-    },
+      database: dbState.getState()
+    }
   });
 });
+
+/* ===============================
+   Routes
+================================= */
 
 app.use('/api/auth', authRoutes);
 app.use('/api/users', userRoutes);
@@ -82,6 +90,10 @@ app.use('/api/admin', adminRoutes);
 app.use('/api/contact', contactRoutes);
 app.use('/api/notifications', notificationRoutes);
 app.use('/api/support', supportRoutes);
+
+/* ===============================
+   Error Handling
+================================= */
 
 app.use(notFound);
 app.use(errorHandler);
