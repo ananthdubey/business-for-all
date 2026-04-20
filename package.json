@@ -1,6 +1,9 @@
 {
   "name": "business-for-all-root",
   "private": true,
+  "engines": {
+  "node": "20.x"
+},
   "workspaces": [
     "frontend",
     "backend"
